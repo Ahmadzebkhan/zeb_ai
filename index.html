@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - Ahmadzeb</title>
+    <style>
+        /* ===== Mobile-First Design ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .input-section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .prompt-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .setting-group {
+            flex: 1 1 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .loading {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        /* Creator Section Styles */
+.creator-section {
+  margin-top: 3rem;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.creator-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.creator-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 5px solid white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.creator-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.creator-info {
+  text-align: center;
+}
+
+.creator-info h3 {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.creator-info h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.creator-info p {
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.creator-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  padding: 0.5rem 1.2rem;
+  background: #3498db;
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(52,152,219,0.3);
+}
+
+.social-link:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52,152,219,0.4);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .creator-card {
+    flex-direction: row;
+    text-align: left;
+  }
+  
+  .creator-info {
+    text-align: left;
+  }
+  
+  .creator-links {
+    justify-content: flex-start;
+  }
+  
+  .creator-image:hover {
+    transform: scale(1.05);
+  }
+}
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .image-info {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .image-prompt {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer strong {
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        /* ===== Tablet & Desktop ===== */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+                padding: 20px;
+            }
+
+            .setting-group {
+                flex: 1 1 calc(50% - 10px);
+            }
+
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .gallery {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Image Generator</h1>
+        
+        <div class="input-section">
+            <input 
+                type="text" 
+                class="prompt-input" 
+                id="promptInput" 
+                placeholder="e.g., 'A cyberpunk cat in neon city'"
+            >
+            
+            <div class="settings">
+                <div class="setting-group">
+                    <label for="modelSelect">Model</label>
+                    <select id="modelSelect">
+                        <option value="stable-diffusion-xl-1024-v1-0">SD XL (Best)</option>
+                        <option value="stable-diffusion-v1-6">SD 1.6</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="styleSelect">Style</label>
+                    <select id="styleSelect">
+                        <option value="none">Default</option>
+                        <option value="3d-model">3D Model</option>
+                        <option value="anime">Anime</option>
+                        <option value="digital-art">Digital Art</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="stepsRange">Steps: <span id="stepsValue">20</span></label>
+                    <input type="range" id="stepsRange" min="10" max="30" value="20">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="cfgRange">Creativity: <span id="cfgValue">7</span></label>
+                    <input type="range" id="cfgRange" min="1" max="20" value="7">
+                </div>
+            </div>
+        </div>
+        
+        <div class="status" id="status">Type something to generate AI art!</div>
+        
+        <div class="gallery" id="imageGallery"></div>
+        
+        <div class="footer">
+            <p>Powered by Stability AI API</p>
+            <p><strong>Created with ❤️ by Ahmadzeb</strong></p>
+        </div>
+        
+        <!-- Add this right before the closing </div> of your container -->
+<section class="creator-section">
+  <div class="creator-card">
+    <div class="creator-image">
+      <img src="ahmadzeb.png" alt="Ahmadzeb - Creator" class="creator-img">
+    </div>
+    <div class="creator-info">
+      <h3>Created With Passion By</h3>
+      <h2>Ahmadzeb</h2>
+      <p>AI ML and Computer Science Student & Web Developer</p>
+      <div class="creator-links">
+        <a href="https://www.tiktok.com/@ahmadzebkhan403?_r=1&_d=e4c445l0k6jhhl&sec_uid=MS4wLjABAAAAfjgjKBeL5N73ghReWspH0ZrqXIHpEP6AaUxEgBlcnj2lmM6TqmCudwrQ_I-LVsgH&share_author_id=7375960326569837600&sharer_language=en&source=h5_m&u_code=eed667ma1hm1l4&timestamp=1751711208&user_id=7375960326569837600&sec_user_id=MS4wLjABAAAAfjgjKBeL5N73ghReWspH0ZrqXIHpEP6AaUxEgBlcnj2lmM6TqmCudwrQ_I-LVsgH&utm_source=copy&utm_campaign=client_share&utm_medium=android&share_iid=7522495039962351383&share_link_id=50606f51-416a-4f96-b0f0-d87041abea1d&share_app_id=1233&ugbiz_name=ACCOUNT&ug_btm=b8727%2Cb7360&social_share_type=5&enable_checksum=1" class="social-link">Tiktok</a>
+        <a href="https://github.com/Ahmadzebkhan" class="social-link">GitHub</a>
+        <a href="https://youtube.com/@future_coder_ahmadzeb?si=EmKCEHi3S6hUbj4A" class="social-link">Youtube</a>
+      </div>
+    </div>
+  </div>
+</section>
+    </div>
+
+   <script>
+    // ===== Configuration =====
+    const API_KEY = 'sk-RYAAvOxRcx1DPz3Jr99WKLCm9qqDtyo9UDep1aRtyiV21MsM';
+    const API_URL = 'https://api.stability.ai/v1/generation';
+    
+    // Supported dimensions for SDXL models
+    const SDXL_DIMENSIONS = [
+        '1024x1024', '1152x896', '1216x832', '1344x768', '1536x640',
+        '640x1536', '768x1344', '832x1216', '896x1152'
+    ];
+    
+    // ===== DOM Elements =====
+    const elements = {
+        promptInput: document.getElementById('promptInput'),
+        modelSelect: document.getElementById('modelSelect'),
+        styleSelect: document.getElementById('styleSelect'),
+        stepsRange: document.getElementById('stepsRange'),
+        stepsValue: document.getElementById('stepsValue'),
+        cfgRange: document.getElementById('cfgRange'),
+        cfgValue: document.getElementById('cfgValue'),
+        imageGallery: document.getElementById('imageGallery'),
+        status: document.getElementById('status')
+    };
+
+    // ===== State Management =====
+    let state = {
+        lastPrompt: '',
+        isGenerating: false,
+        debounceTimer: null
+    };
+
+    // ===== Initial Setup =====
+    function init() {
+        // Update displayed values
+        elements.stepsValue.textContent = elements.stepsRange.value;
+        elements.cfgValue.textContent = elements.cfgRange.value;
+        
+        // Set up event listeners
+        elements.promptInput.addEventListener('input', handleInput);
+        elements.stepsRange.addEventListener('input', () => {
+            elements.stepsValue.textContent = elements.stepsRange.value;
+        });
+        elements.cfgRange.addEventListener('input', () => {
+            elements.cfgValue.textContent = elements.cfgRange.value;
+        });
+        elements.modelSelect.addEventListener('change', generateIfReady);
+        elements.styleSelect.addEventListener('change', generateIfReady);
+        
+        elements.status.textContent = 'Type a prompt to generate images!';
+    }
+
+    // ===== Event Handlers =====
+    function handleInput() {
+        clearTimeout(state.debounceTimer);
+        if (elements.promptInput.value.length > 3) {
+            elements.status.textContent = 'Preparing to generate...';
+            state.debounceTimer = setTimeout(generateImage, 1500);
+        }
+    }
+
+    function generateIfReady() {
+        if (elements.promptInput.value.trim().length > 3 && !state.isGenerating) {
+            generateImage();
+        }
+    }
+
+    // ===== Image Generation =====
+    async function generateImage() {
+        const prompt = elements.promptInput.value.trim();
+        if (!prompt || prompt === state.lastPrompt || state.isGenerating) return;
+        
+        state.lastPrompt = prompt;
+        state.isGenerating = true;
+        elements.status.textContent = "Generating your image...";
+        
+        // Create image card
+        const imageCard = createImageCard(prompt);
+        elements.imageGallery.insertBefore(imageCard, elements.imageGallery.firstChild);
+        
+        try {
+            // Determine dimensions based on model
+            let width, height;
+            if (elements.modelSelect.value.includes('xl-1024')) {
+                // Use standard 1024x1024 for SDXL models
+                width = 1024;
+                height = 1024;
+            } else {
+                // Use smaller size for other models
+                width = 512;
+                height = 512;
+            }
+            
+            // Prepare API request
+            const requestBody = {
+                text_prompts: [{ text: prompt, weight: 1 }],
+                cfg_scale: parseInt(elements.cfgRange.value),
+                height: height,
+                width: width,
+                steps: parseInt(elements.stepsRange.value),
+                samples: 1
+            };
+            
+            // Add style preset if selected
+            if (elements.styleSelect.value !== 'none') {
+                requestBody.style_preset = elements.styleSelect.value;
+            }
+            
+            // Make API call
+            const response = await fetch(
+                `${API_URL}/${elements.modelSelect.value}/text-to-image`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                }
+            );
+            
+            // Handle response
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.artifacts?.[0]?.base64) {
+                throw new Error('No image data received');
+            }
+            
+            // Display the generated image
+            const img = new Image();
+            img.src = `data:image/png;base64,${data.artifacts[0].base64}`;
+            img.onload = () => {
+                imageCard.querySelector('.loading').remove();
+                imageCard.querySelector('.image-container').appendChild(img);
+                elements.status.textContent = 'Success! Try another prompt.';
+            };
+            
+        } catch (error) {
+            console.error('Generation error:', error);
+            const errorDisplay = imageCard.querySelector('.loading div:last-child');
+            errorDisplay.textContent = `Error: ${error.message || 'Generation failed'}`;
+            errorDisplay.style.color = '#e74c3c';
+            elements.status.textContent = 'Error occurred - see image card';
+            
+            // Specific error for dimension issues
+            if (error.message.includes('dimensions')) {
+                errorDisplay.textContent = 'Error: Invalid size for this model';
+            }
+        } finally {
+            state.isGenerating = false;
+        }
+    }
+
+    // ===== Helper Functions =====
+    function createImageCard(prompt) {
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        
+        card.innerHTML = `
+            <div class="image-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Generating your image...</div>
+                </div>
+            </div>
+            <div class="image-info">
+                <div class="image-prompt" title="${prompt}">${prompt}</div>
+                <div class="image-settings">
+                    <span>Model: ${elements.modelSelect.value.split('-')[0]}</span>
+                    <span>Style: ${elements.styleSelect.value || 'Default'}</span>
+                    <span>Steps: ${elements.stepsRange.value}</span>
+                </div>
+            </div>
+        `;
+        
+        return card;
+    }
+
+    // Initialize the app
+    init();
+</script>
+  
+</body>
+</html>
